@@ -1,7 +1,16 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  Delete,
+  Param,
+  Patch,
+  Get,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CameraManagementService } from './camera-management.service';
 import { CreateCameraManagementDto } from './dto/create-camera-management.dto';
+import { UpdateCameraManagementDto } from './dto/update-camera-management.dto';
 import { UserCameraManagementDto } from './dto/user-camera-management.dto';
 
 @ApiTags('camera-management')
@@ -11,7 +20,13 @@ export class CameraManagementController {
     private readonly cameraManagementService: CameraManagementService,
   ) {}
 
-  @Post('stream')
+  @Get('getAllCamera')
+  @ApiOperation({ summary: 'Get All Data IP Camera' })
+  async getAllCamera() {
+    return this.cameraManagementService.getAllcamera();
+  }
+
+  @Post('createCamera')
   @ApiOperation({ summary: 'Create new IP Camera' })
   @ApiBody({
     schema: {
@@ -49,7 +64,7 @@ export class CameraManagementController {
     return this.cameraManagementService.createCamera(body);
   }
 
-  @Post('data')
+  @Post('getCameraByUser')
   @ApiOperation({ summary: 'Get data IP camera' })
   @ApiBody({
     schema: {
@@ -68,7 +83,56 @@ export class CameraManagementController {
       },
     },
   })
-  async getDevice(@Body() body: UserCameraManagementDto) {
-    return this.cameraManagementService.getDevice(body);
+  async getCameraByUser(@Body() body: UserCameraManagementDto) {
+    return this.cameraManagementService.getCameraByUser(body);
+  }
+
+  @Patch('updateCamera/:id')
+  @ApiOperation({ summary: 'UPDATE new data' })
+  @ApiParam({
+    name: 'id',
+    type: 'integer',
+    description: 'enter id',
+    required: true,
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        camera_name: {
+          type: 'string',
+          example: 'Hikvision PTZ',
+          description: 'camera name',
+        },
+        ip_address: {
+          type: 'string',
+          example: '192.168.1.210/axis-media/media.amp',
+          description: 'ip address',
+        },
+        position: {
+          type: 'string',
+          example: 'Side Doors',
+          description: 'position',
+        },
+      },
+    },
+  })
+  updateCamera(
+    @Param('id') id: string,
+    @Body() body: UpdateCameraManagementDto,
+  ) {
+    return this.cameraManagementService.updateCamera(Number(id), body);
+  }
+
+  @Delete('removeCamera/:id')
+  @ApiParam({
+    name: 'id',
+    type: 'integer',
+    description: 'enter id',
+    required: true,
+  })
+  @ApiOperation({ summary: 'Delete IP camera' })
+  async removeCamera(@Param('id') id: number) {
+    return this.cameraManagementService.removeCamera(+id);
   }
 }
