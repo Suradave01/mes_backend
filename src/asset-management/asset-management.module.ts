@@ -27,6 +27,7 @@ import {
   UserModel,
   UserMappingCompanyModel,
 } from 'src/user-management/entities';
+import { AuthenticationModule } from 'src/authentication/authentication.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import {
     ]),
     CompanyManagementModule,
     DeviceManagementModule,
+    AuthenticationModule,
   ],
   controllers: [AssetManagementController],
   providers: [AssetManagementService],

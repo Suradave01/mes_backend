@@ -8,7 +8,7 @@ export class CreateCameraManagementDto {
   @ApiProperty({ type: 'string', description: 'position' })
   position: string;
   @ApiProperty({ type: 'string', description: 'user' })
-  user?: string;
+  user?: string;D
   @ApiProperty({ type: 'string', description: 'pass' })
   pass?: string;
 }

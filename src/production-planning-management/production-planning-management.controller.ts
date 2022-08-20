@@ -15,6 +15,7 @@ import { ProcessImportDataPlanningDto } from 'src/import-data/dto/process-import
 import { UserModel } from 'src/user-management/entities';
 import { CreateWipDto } from './dto/create-wip.dto';
 import { CreateWipFlowDto } from './dto/create-wipFlow.dto';
+import { FindAllWorkOrderByWipDto } from './dto/findAllWorkOrderByWip.dto';
 import { UpdateWipDto } from './dto/update-wip.dto';
 import { UpdateWipFlowDto } from './dto/update-wipFlow.dto';
 import { UpdateWorkOrderItemDto } from './dto/update-workOrderItem.dto';
@@ -23,12 +24,12 @@ import { ProductionPlanningManagementService } from './production-planning-manag
 
 @ApiTags('production-planning-management')
 @Controller('production-planning-management')
-@UseGuards(AuthGuard())
 export class ProductionPlanningManagementController {
   constructor(
     private readonly productionPlanningManagementService: ProductionPlanningManagementService,
   ) {}
 
+  @UseGuards(AuthGuard())
   @Post('createWip')
   async createWip(
     @Body()
@@ -37,6 +38,7 @@ export class ProductionPlanningManagementController {
     await this.productionPlanningManagementService.createWip(createWipDto);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWip/:id')
   async updateWip(
     @Param('id') id: number,
@@ -63,16 +65,19 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllWip')
   async findAllWip() {
     return await this.productionPlanningManagementService.findAllWip();
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllWipActive')
   async findAllWipActive() {
     return await this.productionPlanningManagementService.findAllWipActive();
   }
 
+  @UseGuards(AuthGuard())
   @Post('processCreateWorkOrder/:id')
   async processCreateWorkOrder(
     @Param('id') id: number,
@@ -87,6 +92,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Post('prioritizeWorkOrder')
   async prioritizeWorkOrder(@Body() prioritize: any) {
     return await this.productionPlanningManagementService.prioritizeWorkOrder(
@@ -94,15 +100,19 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Post('wipMappingAsset/:id')
   async wipMappingAsset(@Param('id') id: number) {}
 
+  @UseGuards(AuthGuard())
   @Delete('wipUnMappingAsset/:id')
   async wipUnMappingAsset(@Param('id') id: number) {}
 
+  @UseGuards(AuthGuard())
   @Delete('removeWip/:id')
   async removeWip(@Param('id') id: number) {}
 
+  @UseGuards(AuthGuard())
   @Post('createWipFlow')
   async createWipFlow(
     @Body()
@@ -113,6 +123,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllWipFlow')
   async findAllWipFlow() {
     return await this.productionPlanningManagementService.findAllWipFlow();
@@ -123,6 +134,7 @@ export class ProductionPlanningManagementController {
     return await this.productionPlanningManagementService.findOneWipFlow(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWipFlow/:id')
   async updateWipFlow(
     @Param('id') id: number,
@@ -141,16 +153,25 @@ export class ProductionPlanningManagementController {
   //   );
   // }
 
-  @Get('findAllWorkOrderByWip/:id')
-  findAllWorkOrderByWip(@Param('id') id: number) {
-    return this.productionPlanningManagementService.findAllWorkOrderByWip(+id);
+  // @UseGuards(AuthGuard())
+  @Post('findAllWorkOrderByWip/:id')
+  findAllWorkOrderByWip(
+    @Param('id') id: number,
+    @Body() body: FindAllWorkOrderByWipDto,
+    @GetUser() user: UserModel,
+  ) {
+    // if (user.is_system === true) {
+
+    return this.productionPlanningManagementService.findAllWorkOrderByWip(
+      +id,
+      body,
+    );
+    // } else {
+    //   return false;
+    // }
   }
 
-  @Get('findWorkOrderByDate/:date')
-  findWorkOrderByDate(@Param('date') date: string) {
-    return this.productionPlanningManagementService.findWorkOrderByDate(date);
-  }
-
+  @UseGuards(AuthGuard())
   @Patch('updateWorkOrderItemType/:id')
   async updateWorkOrderItemType(@Param('id') id: number, @Body() options) {
     return await this.productionPlanningManagementService.updateWorkOrderItemType(
@@ -159,6 +180,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWorkOrderItemNextAsset/:id')
   async updateWorkOrderItemNextAsset(@Param('id') id: number, @Body() options) {
     return await this.productionPlanningManagementService.updateWorkOrderItemNextAsset(
@@ -167,6 +189,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWorkOrderItemDetail/:id')
   async updateWorkOrderItemDetail(@Param('id') id: number, @Body() options) {
     return await this.productionPlanningManagementService.updateWorkOrderItemDetail(
@@ -175,6 +198,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWoItemStart/:id')
   async updateWoItemStart(
     @Param('id') id: number,
@@ -186,6 +210,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWoItemStop/:id')
   async updateWoItemStop(
     @Param('id') id: number,
@@ -197,6 +222,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWoItemResume/:id')
   async updateWoItemResume(
     @Param('id') id: number,
@@ -208,6 +234,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWoItemCancel/:id')
   async updateWoItemCancel(
     @Param('id') id: number,
@@ -219,6 +246,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWoItemRetrieve/:id')
   async updateWoItemRetrieve(
     @Param('id') id: number,
@@ -230,6 +258,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateWoItemFinish/:id')
   async updateWoItemFinish(
     @Param('id') id: number,
@@ -241,6 +270,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Patch('copyWorkOrder/:id')
   async copyWorkOrder(@Param('id') id: number, @GetUser() user: UserModel) {
     return await this.productionPlanningManagementService.copyWorkOrder(
@@ -249,6 +279,7 @@ export class ProductionPlanningManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Get('getValueSensorSuccess/:id')
   async getValueSensorSuccess(@Param('id') id: number) {
     return await this.productionPlanningManagementService.getValueSensorSuccess(

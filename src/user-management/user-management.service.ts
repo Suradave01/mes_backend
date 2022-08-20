@@ -835,6 +835,20 @@ export class UserManagementService {
     return model;
   }
 
+  async findAllUserMenu(user: UserModel) {
+    const model = await this.UserModelRepository.findOne(user.id, {
+      relations: [
+        'UserMappingPartitions',
+        'UserMappingGroups',
+        'UserMappingRoles',
+        'UserMappingRoles.Role',
+        'UserMappingCompanies',
+        'Contacts',
+      ],
+    });
+    return model;
+  }
+
   async findAllUser_ServerSide(request: any, resultsCallback: any) {
     const serverSide = new ServerSideRender();
     const table = 'tb_user';

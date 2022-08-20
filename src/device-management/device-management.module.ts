@@ -30,6 +30,7 @@ import {
   UserModel,
   UserMappingCompanyModel,
 } from 'src/user-management/entities';
+import { AuthenticationModule } from 'src/authentication/authentication.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import {
       DeviceFieldModel,
       ConditionTypeModel,
     ]),
+    AuthenticationModule,
     CompanyManagementModule,
     ClientsModule.register([
       {

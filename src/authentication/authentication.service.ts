@@ -21,7 +21,11 @@ export class AuthenticationService {
     if (username) {
       const user = await this.UserModelRepository.findOne({ username });
       if (user && (await bcrypt.compare(password, user.password))) {
-        const payload = { username: user.username, user_id: user.id };
+        const payload = {
+          username: user.username,
+          user_id: user.id,
+          is_system: user.is_system,
+        };
         return { accessToken: this.jwtService.sign(payload) };
       } else {
         throw new UnauthorizedException('Please check your login credentials.');

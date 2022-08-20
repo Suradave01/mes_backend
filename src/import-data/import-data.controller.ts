@@ -10,6 +10,7 @@ import {
   Res,
   UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -25,9 +26,11 @@ import { editFileName, imageFileFilter } from './utils/file-upload-util';
 import { ImportDataService } from './import-data.service';
 import { ProductionPlanningManagementService } from 'src/production-planning-management/production-planning-management.service';
 import { ProcessImportDataPlanningDto } from './dto/process-import-data-planning.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('import-data')
 @Controller('import-data')
+@UseGuards(AuthGuard())
 export class ImportDataController {
   constructor(
     readonly importDataService: ImportDataService,

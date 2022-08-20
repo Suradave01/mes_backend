@@ -7,4 +7,8 @@ export class UpdateCameraManagementDto {
   ip_address: string;
   @ApiProperty({ type: 'string', description: 'position' })
   position: string;
+  @ApiProperty({ type: 'string', description: 'user' })
+  user?: string;
+  @ApiProperty({ type: 'string', description: 'pass' })
+  pass?: string;
 }

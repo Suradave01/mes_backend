@@ -110,7 +110,7 @@ export const StateAssetDef = {
           // actions: ['CoResumeWorkOrderItem'],
         },
         [AssetTransition.FINISH]: {
-          target: AssetState.CANCEL,
+          target: AssetState.ACTIVE,
           // actions: ['CoCancelWorkOrderItem'],
         },
       },

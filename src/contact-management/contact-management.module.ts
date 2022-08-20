@@ -19,6 +19,7 @@ import {
   UserMappingCompanyModel,
 } from 'src/user-management/entities';
 import { ContactModel, ContactMappingChannelModel } from './entities';
+import { AuthenticationModule } from 'src/authentication/authentication.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ContactModel, ContactMappingChannelModel } from './entities';
       ContactModel,
       ContactMappingChannelModel,
     ]),
+    AuthenticationModule,
   ],
   controllers: [ContactManagementController],
   providers: [ContactManagementService],

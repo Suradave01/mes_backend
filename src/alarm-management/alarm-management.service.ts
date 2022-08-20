@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { StateRunner } from 'src/share/lib/state-runner';
 import { ChannelTransition } from 'src/state/alarm-management/channel.state';
 import { Connection, Repository } from 'typeorm';
-import { CreateChannelDto } from './dto/createChannet.dto';
+import { CreateChannelDto } from './dto/createChannel.dto';
 import { UpdateChannelDto } from './dto/updateChannel.dto';
 import { ChannelModel } from './entities';
 import line from '@line/bot-sdk';
 import { Notify } from 'line-api';
 import { LineNotifyDto } from './dto/lineNotify.dto';
+import { CreateContactMappingChannelDto } from './dto/createContactMappingChannel.dto';
+import { ContactMappingChannelModel } from 'src/contact-management/entities';
+import { ContactMappingChannelTransition } from 'src/state/contact-management/contact_mapping_channel-state';
 
 @Injectable()
 export class AlarmManagementService {
@@ -154,24 +157,55 @@ export class AlarmManagementService {
   //   client.pushMessage('<to>', message);
   // }
 
+  async createContactMappingChannel(
+    createContactMappingChannelDto: CreateContactMappingChannelDto,
+  ) {
+    const { contact_id, value, channel_id, _primary } =
+      createContactMappingChannelDto;
+
+    for (let i = 0; i < contact_id.length; i++) {
+      const stateRunner = await new StateRunner(this.connection).start();
+      const model = new ContactMappingChannelModel();
+
+      model.contact_id = contact_id[i];
+      model.value = value;
+      model.channel_id = channel_id;
+      model._primary = _primary;
+      await stateRunner.manager.save(model);
+      if (model.state === 'start') {
+        model.apply(ContactMappingChannelTransition.NEW, stateRunner);
+        await model.saveState();
+      }
+      await stateRunner.cleanup();
+    }
+  }
+
   async lineNotify(body: LineNotifyDto) {
-    const notify = new Notify({
-      // token: 'CvCwQkS2q4IY2ytLIqYj75retX0u0oyYPncTfClQtag',//group
-      token: 'RjkgpmRqJJaB1wLTbWbvcGxptno0hvqzMMmfHZl5x1D', //person
-    });
+    const array = [
+      'RjkgpmRqJJaB1wLTbWbvcGxptno0hvqzMMmfHZl5x1D',
+      'CvCwQkS2q4IY2ytLIqYj75retX0u0oyYPncTfClQtag',
+    ];
+    for (let i = 0; i < array.length; i++) {
+      const token = array[i];
+      const notify = new Notify({
+        // token: 'CvCwQkS2q4IY2ytLIqYj75retX0u0oyYPncTfClQtag',//group
+        // token: 'RjkgpmRqJJaB1wLTbWbvcGxptno0hvqzMMmfHZl5x1D', //person
+        token: token,
+      });
 
-    const imageFile =
-      'https://images.freeimages.com/images/large-previews/389/mitze-1380778.jpg';
+      const imageFile =
+        'https://images.freeimages.com/images/large-previews/389/mitze-1380778.jpg';
 
-    notify
-      .send({
-        message: body.message,
-        // sticker: { packageId: 1, id: 2 }, // exact ids
-        // image: { fullsize: imageFile, thumbnail: imageFile }, // remote url
-      })
-      .then(console.log);
-    // { status: 200, message: 'ok' }
+      notify
+        .send({
+          message: body.message,
+          // sticker: { packageId: 1, id: 2 }, // exact ids
+          // image: { fullsize: imageFile, thumbnail: imageFile }, // remote url
+        })
+        .then(console.log);
+      // { status: 200, message: 'ok' }
 
-    notify.status().then(console.log);
+      notify.status().then(console.log);
+    }
   }
 }

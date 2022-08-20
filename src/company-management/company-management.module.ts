@@ -15,6 +15,7 @@ import {
   UserMappingCompanyModel,
 } from 'src/user-management/entities';
 import { ImportModel, CompanyModel, CustomerModel } from './entities';
+import { AuthenticationModule } from 'src/authentication/authentication.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ImportModel, CompanyModel, CustomerModel } from './entities';
       CustomerModel,
       ContactModel,
     ]),
+    AuthenticationModule,
   ],
   controllers: [CompanyManagementController],
   providers: [CompanyManagementService],

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Inject,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ClientProxy,
@@ -16,6 +17,7 @@ import {
   Payload,
   Server,
 } from '@nestjs/microservices';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { DeviceFieldModel } from 'src/asset-management/entities/device_field.entity';
 import { StateRunner } from 'src/share/lib/state-runner';
@@ -29,6 +31,7 @@ import { UpdateDeviceDto } from './dto/update-device.dto';
 
 @ApiTags('device-management')
 @Controller('device-management')
+// @UseGuards(AuthGuard())
 export class DeviceManagementController {
   constructor(
     private readonly connection: Connection,
@@ -41,26 +44,31 @@ export class DeviceManagementController {
     await this.client.connect();
   }
 
+  @UseGuards(AuthGuard())
   @Post('createDevice')
   createDevice(@Body() createDeviceDto: CreateDeviceDto) {
     return this.deviceManagementService.createDevice(createDeviceDto);
   }
 
+  @UseGuards(AuthGuard())
   @Post('createDeviceField')
   createDeviceField(@Body() createDeviceFieldDto: CreateDeviceFieldDto) {
     return this.deviceManagementService.createDeviceField(createDeviceFieldDto);
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllDevice')
   findAllDevice() {
     return this.deviceManagementService.findAllDevice();
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllDeviceUnMapAsset')
   findAllDeviceUnMapAsset() {
     return this.deviceManagementService.findAllDeviceUnMapAsset();
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllDeviceField')
   findAllDeviceField() {
     return this.deviceManagementService.findAllDeviceField();
@@ -71,6 +79,7 @@ export class DeviceManagementController {
     return this.deviceManagementService.findOneDevice(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateDevice/:id')
   updateDevice(
     @Param('id') id: string,
@@ -79,26 +88,31 @@ export class DeviceManagementController {
     return this.deviceManagementService.updateDevice(+id, updateDeviceDto);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateStateDeviceActive/:id')
   updateStateDeviceActive(@Param('id') id: string) {
     return this.deviceManagementService.updateStateDeviceActive(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateStateDeviceFieldActive/:id')
   updateStateDeviceFieldActive(@Param('id') id: string) {
     return this.deviceManagementService.updateStateDeviceFieldActive(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateStateDeviceInactive/:id')
   updateStateDeviceInactive(@Param('id') id: string) {
     return this.deviceManagementService.updateStateDeviceInactive(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Delete('removeDevice/:id')
   removeDevice(@Param('id') id: string) {
     return this.deviceManagementService.removeDevice(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Delete('removeDeviceField/:id')
   removeDeviceField(@Param('id') id: string) {
     return this.deviceManagementService.removeDeviceField(+id);
@@ -132,7 +146,7 @@ export class DeviceManagementController {
 
     if (lastIndex !== -1) this.dataDevice[lastIndex] = payload;
     if (lastIndex == -1) this.dataDevice.push(payload);
-    console.log(this.dataDevice);
+    // console.log(this.dataDevice);
 
     var d = new Date();
     var hr = d.getHours();
@@ -145,11 +159,12 @@ export class DeviceManagementController {
       hr -= 12;
       ampm = 'pm';
     }
-    console.log('9:50am');
+    // console.log('9:50am');
 
-    console.log(hr + ':' + min + ampm);
+    // console.log(hr + ':' + min + ampm);
   }
 
+  @UseGuards(AuthGuard())
   @Get('updateDataDeviceField')
   async updateDataDeviceField() {
     const params = this.dataDevice;
@@ -162,6 +177,7 @@ export class DeviceManagementController {
   //   await this.deviceManagementService.passingDataDeviceField(id, payload);
   // }
 
+  @UseGuards(AuthGuard())
   @Post('createConditionType')
   async createConditionType(
     @Body() createConditionTypeDto: CreateConditionTypeDto,
@@ -171,6 +187,7 @@ export class DeviceManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Get('findAllConditionType')
   findAllConditionType() {
     return this.deviceManagementService.findAllConditionType();
@@ -181,6 +198,7 @@ export class DeviceManagementController {
     return this.deviceManagementService.findOneConditionType(+id);
   }
 
+  @UseGuards(AuthGuard())
   @Patch('updateConditionType/:id')
   updateConditionType(
     @Param('id') id: string,
@@ -192,8 +210,17 @@ export class DeviceManagementController {
     );
   }
 
+  @UseGuards(AuthGuard())
   @Delete('removeConditionType/:id')
   removeConditionType(@Param('id') id: string) {
     return this.deviceManagementService.removeConditionType(+id);
+  }
+
+  @Post('plc/sensor_reset')
+  async pubResetSensor(@Body() asset_id: number) {
+    const data = {
+      values: 0,
+    };
+    this.client.emit<any>(`plc/sensor_reset/${asset_id}`, data);
   }
 }

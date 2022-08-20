@@ -2,8 +2,7 @@
 import { TriggerModel } from 'src/asset-management/entities';
 import { CompanyModel } from 'src/company-management/entities/company.entity';
 import { ContactMappingChannelModel } from 'src/contact-management/entities';
-import { ChannelMappingWipFlowModel } from 'src/production-planning-management/entities';
-import { ChannelMappingWipModel } from 'src/production-planning-management/entities';
+
 import { BaseState } from 'src/share/lib/base-state';
 import {
   StateChannelDef,
@@ -19,6 +18,7 @@ import {
   OneToMany,
   ManyToOne,
 } from 'typeorm';
+import { ChannelMappingWipFlowModel, ChannelMappingWipModel } from '.';
 import { MessageModel } from './message.entity';
 import { TemplateModel } from './template.entity';
 @Entity({ name: 'tb_channel' })

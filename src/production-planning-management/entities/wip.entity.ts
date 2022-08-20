@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { ChannelMappingWipModel } from 'src/alarm-management/entities';
 import { AssetModel } from 'src/asset-management/entities';
 import { CompanyModel } from 'src/company-management/entities';
 import { BaseState } from 'src/share/lib/base-state';
@@ -15,7 +16,6 @@ import {
   OneToMany,
   ManyToOne,
 } from 'typeorm';
-import { ChannelMappingWipModel } from './channel_mapping_wip.entity';
 import { WipFlowMappingModel } from './wip_flow_mapping.entity';
 @Entity({ name: 'tb_wip' })
 export class WipModel extends BaseState {

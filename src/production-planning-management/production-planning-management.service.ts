@@ -5,7 +5,7 @@ import { WipTransition } from 'src/state/production-planning-management/wip.stat
 import { WipFlowTransition } from 'src/state/production-planning-management/wip_flow-state';
 import { WipFlowMappingTransition } from 'src/state/production-planning-management/wip_flow_mapping-state';
 import { WorkOrderTransition } from 'src/state/production-planning-management/workorder-state';
-import { Connection, MoreThan, Not, Repository } from 'typeorm';
+import { Connection, Like, MoreThan, Not, Repository } from 'typeorm';
 import { CreateProductionDto } from './dto/create-production.dto';
 import { CreateWipDto } from './dto/create-wip.dto';
 import { CreateWipFlowDto } from './dto/create-wipFlow.dto';
@@ -35,6 +35,7 @@ import { AssetModel } from 'src/asset-management/entities';
 import { AssetTransition } from 'src/state/asset-management/asset-state';
 import { ImportTransition } from 'src/state/company-management/import-state';
 import { UserModel } from 'src/user-management/entities';
+import { FindAllWorkOrderByWipDto } from './dto/findAllWorkOrderByWip.dto';
 
 @Injectable()
 export class ProductionPlanningManagementService {
@@ -850,68 +851,130 @@ export class ProductionPlanningManagementService {
   //   return data;
   // }
 
-  async findAllWorkOrderByWip(id: number) {
+  async findAllWorkOrderByWip(id: number, body: FindAllWorkOrderByWipDto) {
+    const { date, condition } = body;
+    //condition วันที่ import / วันที่ต้องส่ง
     var start = +new Date(); // log start timestamp
     console.log(start);
+    console.log(condition);
+    console.log(date);
 
     let data = [];
     let dataItem = {};
     let workOrderItem_id = [];
+    const dateNow = new Date();
+    const today = dateNow.toISOString().substring(0, 10);
+    console.log(today);
 
-    const wipFlowMapping: any = await this.WipFlowMappingModelRepository.find({
-      where: { wip_id: id },
-      relations: [
-        'WIPFlow',
-        'WIPFlow.WorkOrders',
-        'WIPFlow.WorkOrders.WorkOrderItems',
-      ],
-    });
-    for (let i = 0; i < wipFlowMapping.length; i++) {
-      const wo = wipFlowMapping[i].WIPFlow.WorkOrders;
-      if (wo.length > 0) {
-        for (let j = 0; j < wo.length; j++) {
-          const workOrder = await wo[j];
-          const workOrderItems = await wo[j].WorkOrderItems;
-          for (let k = 0; k < workOrderItems.length; k++) {
-            if (workOrderItems[k].wip_flow_mapping_id == wipFlowMapping[i].id) {
-              const workOrderItem = await workOrderItems[k];
+    // return data;
 
-              dataItem['workorder_id'] = workOrder.id;
-              dataItem['prioritize'] = workOrder.prioritize;
-              workOrderItem_id.push(workOrderItem.id);
-              dataItem['workorder_item_id'] = workOrderItem_id;
+    if (condition === 'created_at') {
+      const wipFlowMapping: any = await this.WipFlowMappingModelRepository.find(
+        {
+          where: { wip_id: id, created_at: Like(`%${date}%`) },
+          relations: [
+            'WIPFlow',
+            'WIPFlow.WorkOrders',
+            'WIPFlow.WorkOrders.WorkOrderItems',
+          ],
+        },
+      );
+      for (let i = 0; i < wipFlowMapping.length; i++) {
+        const wo = wipFlowMapping[i].WIPFlow.WorkOrders;
+        if (wo.length > 0) {
+          for (let j = 0; j < wo.length; j++) {
+            const workOrder = await wo[j];
+            const workOrderItems = await wo[j].WorkOrderItems;
+            for (let k = 0; k < workOrderItems.length; k++) {
+              if (
+                workOrderItems[k].wip_flow_mapping_id == wipFlowMapping[i].id
+              ) {
+                const workOrderItem = await workOrderItems[k];
 
-              dataItem[workOrderItem.field_name] = workOrderItem.field_value;
-              dataItem['state_wo'] = workOrder.state;
-              dataItem['state'] = workOrderItem.state;
-              dataItem['wip_flow_mapping_id'] = wipFlowMapping[i].id;
+                dataItem['workorder_id'] = workOrder.id;
+                dataItem['prioritize'] = workOrder.prioritize;
+                workOrderItem_id.push(workOrderItem.id);
+                dataItem['workorder_item_id'] = workOrderItem_id;
+
+                dataItem[workOrderItem.field_name] = workOrderItem.field_value;
+                dataItem['state_wo'] = workOrder.state;
+                dataItem['state'] = workOrderItem.state;
+                dataItem['wip_flow_mapping_id'] = wipFlowMapping[i].id;
+              }
             }
-          }
-          if (dataItem['workorder_id']) {
-            workOrderItem_id = [];
-            data.push(dataItem);
-            dataItem = {};
+            if (dataItem['workorder_id']) {
+              workOrderItem_id = [];
+              data.push(dataItem);
+              dataItem = {};
+            }
           }
         }
       }
+
+      var end = +new Date(); // log end timestamp
+      var diff = end - start;
+      data.sort((a, b) => {
+        return a.prioritize - b.prioritize;
+      });
+      console.log(diff);
+      return data;
+    } else if (condition === 'date_ex') {
+      const wipFlowMapping: any = await this.WipFlowMappingModelRepository.find(
+        {
+          where: { wip_id: id },
+          relations: [
+            'WIPFlow',
+            'WIPFlow.WorkOrders',
+            'WIPFlow.WorkOrders.WorkOrderItems',
+          ],
+        },
+      );
+      for (let i = 0; i < wipFlowMapping.length; i++) {
+        const wo = wipFlowMapping[i].WIPFlow.WorkOrders;
+        if (wo.length > 0) {
+          for (let j = 0; j < wo.length; j++) {
+            const workOrder = await wo[j];
+            const workOrderItems = await wo[j].WorkOrderItems;
+            for (let k = 0; k < workOrderItems.length; k++) {
+              if (
+                workOrderItems[k].wip_flow_mapping_id == wipFlowMapping[i].id
+              ) {
+                const workOrderItem = await workOrderItems[k];
+
+                dataItem['workorder_id'] = workOrder.id;
+                dataItem['prioritize'] = workOrder.prioritize;
+                workOrderItem_id.push(workOrderItem.id);
+                dataItem['workorder_item_id'] = workOrderItem_id;
+
+                dataItem[workOrderItem.field_name] = workOrderItem.field_value;
+                dataItem['state_wo'] = workOrder.state;
+                dataItem['state'] = workOrderItem.state;
+                dataItem['wip_flow_mapping_id'] = wipFlowMapping[i].id;
+              }
+            }
+            if (dataItem['workorder_id']) {
+              workOrderItem_id = [];
+              data.push(dataItem);
+              dataItem = {};
+            }
+          }
+        }
+      }
+
+      var end = +new Date(); // log end timestamp
+      var diff = end - start;
+      data.sort((a, b) => {
+        return a.prioritize - b.prioritize;
+      });
+      var newData = data.filter(function (obj) {
+        return obj.date_pro == date;
+      });
+      for (let index = 0; index < newData.length; index++) {
+        console.log(newData[index].workorder_id);
+        console.log(newData[index].date_pro);
+      }
+      return newData;
     }
-
-    var end = +new Date(); // log end timestamp
-    var diff = end - start;
-    data.sort((a, b) => {
-      return a.prioritize - b.prioritize;
-    });
-    console.log(diff);
-    return data;
-  }
-
-  async findWorkOrderByDate(date: string) {
-    const myArray = await this.findAllWorkOrderByWip(1);
-    console.log(myArray);
-
-    const d = myArray.find((x) => x.date_pro === '23/04/2565');
-
-    console.log(d);
   }
 
   async prioritizeWorkOrder(prioritize: any) {

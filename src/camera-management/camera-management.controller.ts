@@ -87,6 +87,18 @@ export class CameraManagementController {
     return this.cameraManagementService.getCameraByUser(body);
   }
 
+  @Get('getCameraById/:id')
+  @ApiOperation({ summary: 'Get data IP camera By ID' })
+  @ApiParam({
+    name: 'id',
+    type: 'integer',
+    description: 'enter id',
+    required: true,
+  })
+  async getCameraById(@Param('id') id: string) {
+    return this.cameraManagementService.getCameraById(Number(id));
+  }
+
   @Patch('updateCamera/:id')
   @ApiOperation({ summary: 'UPDATE new data' })
   @ApiParam({
@@ -114,10 +126,20 @@ export class CameraManagementController {
           example: 'Side Doors',
           description: 'position',
         },
+        user: {
+          type: 'string',
+          example: 'admin',
+          description: 'username',
+        },
+        pass: {
+          type: 'string',
+          example: '123123',
+          description: 'password',
+        },
       },
     },
   })
-  updateCamera(
+  async updateCamera(
     @Param('id') id: string,
     @Body() body: UpdateCameraManagementDto,
   ) {

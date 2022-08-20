@@ -10,17 +10,17 @@ import { CameraModel } from './entities/camera.entity';
 export class CameraManagementService {
   constructor(
     @InjectRepository(CameraModel)
-    private DevicesRepository: Repository<CameraModel>,
+    private CameraRepository: Repository<CameraModel>,
   ) {}
 
   async getAllcamera() {
-    return this.DevicesRepository.find();
+    return this.CameraRepository.find();
   }
 
   async createCamera(data: CreateCameraManagementDto) {
     if (data.user && data.pass) {
       const rtsp = `rtsp://${data.user}:${data.pass}@${data.ip_address}`;
-      return this.DevicesRepository.save({
+      return this.CameraRepository.save({
         camera_name: data.camera_name,
         ip_address: rtsp,
         position: data.position,
@@ -28,7 +28,7 @@ export class CameraManagementService {
         pass: data.pass,
       });
     }
-    return this.DevicesRepository.save({
+    return this.CameraRepository.save({
       camera_name: data.camera_name,
       ip_address: `rtsp://${data.ip_address}`,
       position: data.position,
@@ -36,7 +36,7 @@ export class CameraManagementService {
   }
 
   async getCameraByUser(data: UserCameraManagementDto) {
-    return this.DevicesRepository.find({
+    return this.CameraRepository.find({
       where: {
         user: data.user,
         pass: data.pass,
@@ -44,11 +44,29 @@ export class CameraManagementService {
     });
   }
 
+  async getCameraById(id: number) {
+    return this.CameraRepository.findOne(id);
+  }
+
   async updateCamera(id: number, data: UpdateCameraManagementDto) {
-    return this.DevicesRepository.update(id, data);
+    if (data.user && data.pass) {
+      const rtsp = `rtsp://${data.user}:${data.pass}@${data.ip_address}`;
+      return this.CameraRepository.update(id, {
+        camera_name: data.camera_name,
+        ip_address: rtsp,
+        position: data.position,
+        user: data.user,
+        pass: data.pass,
+      });
+    }
+    return this.CameraRepository.update(id, {
+      camera_name: data.camera_name,
+      ip_address: `rtsp://${data.ip_address}`,
+      position: data.position,
+    });
   }
 
   async removeCamera(id: number) {
-    return await this.DevicesRepository.delete(id);
+    return await this.CameraRepository.delete(id);
   }
 }

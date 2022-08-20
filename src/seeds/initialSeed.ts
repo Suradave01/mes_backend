@@ -11,7 +11,12 @@ import {
   WipFlowModel,
   WipModel,
 } from 'src/production-planning-management/entities';
-import { AssetModel } from 'src/asset-management/entities';
+import {
+  AssetMappingDeviceModel,
+  AssetModel,
+  DeviceFieldModel,
+  DeviceModel,
+} from 'src/asset-management/entities';
 
 export default class InitialDatabaseSeed implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<void> {
@@ -181,10 +186,98 @@ export default class InitialDatabaseSeed implements Seeder {
           wip_id: 4,
         },
         {
-          asset_name: 'P074',
+          asset_name: 'P74',
           description: 'พิมพ์ 4 สี',
           company_id: 1,
           wip_id: 4,
+        },
+      ])
+      .execute();
+
+    await connection
+      .createQueryBuilder()
+      .insert()
+      .into(DeviceModel)
+      .values([
+        {
+          device_name: 'speed_p74',
+          description: 'ความเร็วเครื่อง',
+          company_id: 1,
+        },
+        {
+          device_name: 'product_counter',
+          description: 'จำนวนชิ้นงาน',
+          company_id: 1,
+        },
+        {
+          device_name: 'OK/NG/NC',
+          description: 'กองก่อนตัด',
+          company_id: 1,
+        },
+        {
+          device_name: 'OK',
+          description: 'กองคัด',
+          company_id: 1,
+        },
+      ])
+      .execute();
+
+    await connection
+      .createQueryBuilder()
+      .insert()
+      .into(DeviceFieldModel)
+      .values([
+        {
+          device_id: 1,
+          field_name: 'speed',
+          field_type: 'number',
+          field_order: 1,
+        },
+        {
+          device_id: 2,
+          field_name: 'amount_product',
+          field_type: 'number',
+          field_order: 1,
+        },
+        {
+          device_id: 3,
+          field_name: 'OK/NG/NC',
+          field_type: 'number',
+          field_order: 1,
+        },
+        {
+          device_id: 4,
+          field_name: 'OK',
+          field_type: 'number',
+          field_order: 1,
+        },
+      ])
+      .execute();
+
+    await connection
+      .createQueryBuilder()
+      .insert()
+      .into(AssetMappingDeviceModel)
+      .values([
+        {
+          asset_id: 8,
+          device_id: 1,
+          device_order: 1,
+        },
+        {
+          asset_id: 8,
+          device_id: 2,
+          device_order: 2,
+        },
+        {
+          asset_id: 8,
+          device_id: 3,
+          device_order: 3,
+        },
+        {
+          asset_id: 8,
+          device_id: 4,
+          device_order: 4,
         },
       ])
       .execute();

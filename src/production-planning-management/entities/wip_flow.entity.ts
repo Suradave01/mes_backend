@@ -15,7 +15,7 @@ import {
   ManyToOne,
   OneToOne,
 } from 'typeorm';
-import { ChannelMappingWipFlowModel } from './channel_mapping_wip_flow.entity';
+import { ChannelMappingWipFlowModel } from '../../alarm-management/entities/channel_mapping_wip_flow.entity';
 import { ProductionModel } from './production.entity';
 import { WipFlowMappingModel } from './wip_flow_mapping.entity';
 import { WorkOrderModel } from './workorder.entity';
