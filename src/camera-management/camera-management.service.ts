@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Stream from 'node-rtsp-stream';
 import { CreateCameraManagementDto } from './dto/create-camera-management.dto';
 import { UpdateCameraManagementDto } from './dto/update-camera-management.dto';
 import { UserCameraManagementDto } from './dto/user-camera-management.dto';
+import { ViewCameraManagementDto } from './dto/view-camera-management.dto';
 import { CameraModel } from './entities/camera.entity';
 
 @Injectable()
@@ -42,6 +44,10 @@ export class CameraManagementService {
         pass: data.pass,
       },
     });
+  }
+
+  async viewCamera(data: ViewCameraManagementDto) {
+    return data;
   }
 
   async getCameraById(id: number) {

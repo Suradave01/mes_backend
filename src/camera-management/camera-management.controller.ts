@@ -12,6 +12,7 @@ import { CameraManagementService } from './camera-management.service';
 import { CreateCameraManagementDto } from './dto/create-camera-management.dto';
 import { UpdateCameraManagementDto } from './dto/update-camera-management.dto';
 import { UserCameraManagementDto } from './dto/user-camera-management.dto';
+import { ViewCameraManagementDto } from './dto/view-camera-management.dto';
 
 @ApiTags('camera-management')
 @Controller('camera-management')
@@ -72,8 +73,8 @@ export class CameraManagementController {
       properties: {
         user: {
           type: 'string',
-          example: 'admin',
-          description: 'username',
+          example: '192.168.1.210/axis-media/media.amp',
+          description: 'rtsp',
         },
         pass: {
           type: 'string',
@@ -85,6 +86,25 @@ export class CameraManagementController {
   })
   async getCameraByUser(@Body() body: UserCameraManagementDto) {
     return this.cameraManagementService.getCameraByUser(body);
+  }
+
+  @Post('viewCamera')
+  @ApiOperation({ summary: 'View Stream IP Camera' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        rtsp: {
+          type: 'string',
+          example:
+            'rtsp://admin:D3v0t3D%$@tsdbpvpn.dyndns.org/doc/page/preview.asp',
+          description: 'rtsp stream',
+        },
+      },
+    },
+  })
+  async viewCamera(@Body() body: ViewCameraManagementDto) {
+    return this.cameraManagementService.viewCamera(body);
   }
 
   @Get('getCameraById/:id')

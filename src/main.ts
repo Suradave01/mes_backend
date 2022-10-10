@@ -11,6 +11,7 @@ import helmet from 'fastify-helmet';
 import { contentParser } from 'fastify-multer';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import line from '@line/bot-sdk';
+import Stream from 'node-rtsp-stream';
 
 dotenv.config();
 
@@ -54,6 +55,10 @@ async function bootstrap() {
       url: 'mqtt://broker.hivemq.com:1883',
     },
   });
+
+  const rtsp = (data: any) => {
+    Stream(options).start();
+  };
 
   SwaggerModule.setup(`${prefix}/swagger`, app, document);
   await app.startAllMicroservices();
